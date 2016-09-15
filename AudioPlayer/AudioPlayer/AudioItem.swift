@@ -38,11 +38,13 @@ quality.
 public struct AudioItemURL {
     public let quality: AudioQuality
     public let URL: NSURL
+    public let headers: [NSObject : AnyObject]?
 
-    public init?(quality: AudioQuality, URL: NSURL?) {
+    public init?(quality: AudioQuality, URL: NSURL?, headers: [NSObject : AnyObject]? = nil) {
         if let URL = URL {
             self.quality = quality
             self.URL = URL
+            self.headers = headers
         }
         else {
             return nil
@@ -61,7 +63,7 @@ URLs can be remote or local.
 public class AudioItem: NSObject {
     /// Returns the available qualities
     public let soundURLs: [AudioQuality: NSURL]
-
+    public private (set) var headers: [NSObject: AnyObject]?
 
     // MARK: Initialization
 
@@ -74,7 +76,7 @@ public class AudioItem: NSObject {
 
     - returns: An initialized `AudioItem` if there is at least a non-null URL.
     */
-    public convenience init?(highQualitySoundURL: NSURL? = nil, mediumQualitySoundURL: NSURL? = nil, lowQualitySoundURL: NSURL? = nil) {
+    public convenience init?(highQualitySoundURL: NSURL? = nil, mediumQualitySoundURL: NSURL? = nil, lowQualitySoundURL: NSURL? = nil, headers: [NSObject: AnyObject]? = nil) {
         var URLs = [AudioQuality: NSURL]()
         if let highURL = highQualitySoundURL {
             URLs[.High] = highURL
@@ -85,7 +87,7 @@ public class AudioItem: NSObject {
         if let lowURL = lowQualitySoundURL {
             URLs[.Low] = lowURL
         }
-        self.init(soundURLs: URLs)
+        self.init(soundURLs: URLs, headers: headers)
     }
 
     /**
@@ -95,8 +97,9 @@ public class AudioItem: NSObject {
 
     - returns: An initialized `AudioItem` if there is at least an URL in the `soundURLs` dictionary.
     */
-    public init?(soundURLs: [AudioQuality: NSURL]) {
+    public init?(soundURLs: [AudioQuality: NSURL], headers: [NSObject: AnyObject]? = nil) {
         self.soundURLs = soundURLs
+        self.headers = headers
         super.init()
 
         if soundURLs.count == 0 {
@@ -109,23 +112,23 @@ public class AudioItem: NSObject {
 
     /// Returns the highest quality URL found or nil if no URLs are available
     public var highestQualityURL: AudioItemURL {
-        return (AudioItemURL(quality: .High, URL: soundURLs[.High]) ??
-            AudioItemURL(quality: .Medium, URL: soundURLs[.Medium]) ??
-            AudioItemURL(quality: .Low, URL: soundURLs[.Low]))!
+        return (AudioItemURL(quality: .High, URL: soundURLs[.High], headers: headers) ??
+            AudioItemURL(quality: .Medium, URL: soundURLs[.Medium], headers: headers) ??
+            AudioItemURL(quality: .Low, URL: soundURLs[.Low], headers: headers))!
     }
 
     /// Returns the medium quality URL found or nil if no URLs are available
     public var mediumQualityURL: AudioItemURL {
-        return (AudioItemURL(quality: .Medium, URL: soundURLs[.Medium]) ??
-            AudioItemURL(quality: .Low, URL: soundURLs[.Low]) ??
-            AudioItemURL(quality: .High, URL: soundURLs[.High]))!
+        return (AudioItemURL(quality: .Medium, URL: soundURLs[.Medium], headers: headers) ??
+            AudioItemURL(quality: .Low, URL: soundURLs[.Low], headers: headers) ??
+            AudioItemURL(quality: .High, URL: soundURLs[.High], headers: headers))!
     }
 
     /// Returns the lowest quality URL found or nil if no URLs are available
     public var lowestQualityURL: AudioItemURL {
-        return (AudioItemURL(quality: .Low, URL: soundURLs[.Low]) ??
-            AudioItemURL(quality: .Medium, URL: soundURLs[.Medium]) ??
-            AudioItemURL(quality: .High, URL: soundURLs[.High]))!
+        return (AudioItemURL(quality: .Low, URL: soundURLs[.Low], headers: headers) ??
+            AudioItemURL(quality: .Medium, URL: soundURLs[.Medium], headers: headers) ??
+            AudioItemURL(quality: .High, URL: soundURLs[.High], headers: headers))!
     }
 
 
