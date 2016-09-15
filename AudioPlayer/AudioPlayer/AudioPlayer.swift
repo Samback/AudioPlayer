@@ -165,7 +165,7 @@ This protocol contains helpful methods to alert you of specific events.
 If you want to be notified about those events, you will have to set a delegate
 to your `audioPlayer` instance.
 */
-public protocol AudioPlayerDelegate: NSObjectProtocol {
+public protocol AudioPlayerDelegate: class {
     /**
      This method is called when the audio player changes its state.
      A fresh created audioPlayer starts in `.Stopped` mode.
@@ -225,6 +225,26 @@ public protocol AudioPlayerDelegate: NSObjectProtocol {
      - parameter item:        Current item.
      */
     func audioPlayer(audioPlayer: AudioPlayer, didLoadRange range: AudioPlayer.TimeRange, forItem item: AudioItem)
+}
+
+extension AudioPlayerDelegate {
+    public func audioPlayer(audioPlayer: AudioPlayer, didChangeStateFrom from: AudioPlayerState, toState to: AudioPlayerState) {
+    }
+
+    public func audioPlayer(audioPlayer: AudioPlayer, willStartPlayingItem item: AudioItem) {
+    }
+
+    public func audioPlayer(audioPlayer: AudioPlayer, didUpdateProgressionToTime time: NSTimeInterval, percentageRead: Float) {
+    }
+
+    public func audioPlayer(audioPlayer: AudioPlayer, didFindDuration duration: NSTimeInterval, forItem item: AudioItem) {
+    }
+
+    public func audioPlayer(audioPlayer: AudioPlayer, didUpdateEmptyMetadataOnItem item: AudioItem, withData data: Metadata) {
+    }
+
+    public func audioPlayer(audioPlayer: AudioPlayer, didLoadRange range: AudioPlayer.TimeRange, forItem item: AudioItem) {
+    }
 }
 
 
