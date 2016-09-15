@@ -140,7 +140,7 @@ private extension NSObject {
 private extension Array {
     func shuffled() -> [Element] {
         return sort { e1, e2 in
-            random() % 2 == 0
+            arc4random() % 2 == 0
         }
     }
 }
