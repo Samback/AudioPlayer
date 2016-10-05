@@ -18,14 +18,14 @@ import AVFoundation
 /**
 `AudioQuality` differentiates qualities for audio.
 
-- `High`:   The highest quality.
-- `Medium`: The quality between highest and lowest.
-- `Low`:    The lowest quality.
+- `high`:   The highest quality.
+- `medium`: The quality between highest and lowest.
+- `low`:    The lowest quality.
 */
 public enum AudioQuality {
-    case High
-    case Medium
-    case Low
+    case high
+    case medium
+    case low
 }
 
 
@@ -37,13 +37,13 @@ quality.
 */
 public struct AudioItemURL {
     public let quality: AudioQuality
-    public let URL: NSURL
-    public let headers: [NSObject : AnyObject]?
+    public let url: URL
+    public let headers: [AnyHashable: Any]?
 
-    public init?(quality: AudioQuality, URL: NSURL?, headers: [NSObject : AnyObject]? = nil) {
-        if let URL = URL {
+    public init?(quality: AudioQuality, url: URL?, headers: [AnyHashable: Any]? = nil) {
+        if let url = url {
             self.quality = quality
-            self.URL = URL
+            self.url = url
             self.headers = headers
         }
         else {
@@ -60,10 +60,10 @@ An `AudioItem` instance contains every piece of information needed for an `Audio
 
 URLs can be remote or local.
 */
-public class AudioItem: NSObject {
+open class AudioItem: NSObject {
     /// Returns the available qualities
-    public let soundURLs: [AudioQuality: NSURL]
-    public private (set) var headers: [NSObject: AnyObject]?
+    open let soundURLs: [AudioQuality: URL]
+    open fileprivate (set) var headers: [AnyHashable: Any]?
 
     // MARK: Initialization
 
@@ -76,16 +76,16 @@ public class AudioItem: NSObject {
 
     - returns: An initialized `AudioItem` if there is at least a non-null URL.
     */
-    public convenience init?(highQualitySoundURL: NSURL? = nil, mediumQualitySoundURL: NSURL? = nil, lowQualitySoundURL: NSURL? = nil, headers: [NSObject: AnyObject]? = nil) {
-        var URLs = [AudioQuality: NSURL]()
+    public convenience init?(highQualitySoundURL: URL? = nil, mediumQualitySoundURL: URL? = nil, lowQualitySoundURL: URL? = nil, headers: [AnyHashable: Any]? = nil) {
+        var URLs = [AudioQuality: URL]()
         if let highURL = highQualitySoundURL {
-            URLs[.High] = highURL
+            URLs[.high] = highURL
         }
         if let mediumURL = mediumQualitySoundURL {
-            URLs[.Medium] = mediumURL
+            URLs[.medium] = mediumURL
         }
         if let lowURL = lowQualitySoundURL {
-            URLs[.Low] = lowURL
+            URLs[.low] = lowURL
         }
         self.init(soundURLs: URLs, headers: headers)
     }
@@ -97,7 +97,7 @@ public class AudioItem: NSObject {
 
     - returns: An initialized `AudioItem` if there is at least an URL in the `soundURLs` dictionary.
     */
-    public init?(soundURLs: [AudioQuality: NSURL], headers: [NSObject: AnyObject]? = nil) {
+    public init?(soundURLs: [AudioQuality: URL], headers: [AnyHashable: Any]? = nil) {
         self.soundURLs = soundURLs
         self.headers = headers
         super.init()
@@ -111,24 +111,24 @@ public class AudioItem: NSObject {
     // MARK: Quality selection
 
     /// Returns the highest quality URL found or nil if no URLs are available
-    public var highestQualityURL: AudioItemURL {
-        return (AudioItemURL(quality: .High, URL: soundURLs[.High], headers: headers) ??
-            AudioItemURL(quality: .Medium, URL: soundURLs[.Medium], headers: headers) ??
-            AudioItemURL(quality: .Low, URL: soundURLs[.Low], headers: headers))!
+    open var highestQualityURL: AudioItemURL {
+        return (AudioItemURL(quality: .high, url: soundURLs[.high], headers: headers) ??
+            AudioItemURL(quality: .medium, url: soundURLs[.medium], headers: headers) ??
+            AudioItemURL(quality: .low, url: soundURLs[.low], headers: headers))!
     }
 
     /// Returns the medium quality URL found or nil if no URLs are available
-    public var mediumQualityURL: AudioItemURL {
-        return (AudioItemURL(quality: .Medium, URL: soundURLs[.Medium], headers: headers) ??
-            AudioItemURL(quality: .Low, URL: soundURLs[.Low], headers: headers) ??
-            AudioItemURL(quality: .High, URL: soundURLs[.High], headers: headers))!
+    open var mediumQualityURL: AudioItemURL {
+        return (AudioItemURL(quality: .medium, url: soundURLs[.medium], headers: headers) ??
+            AudioItemURL(quality: .low, url: soundURLs[.low], headers: headers) ??
+            AudioItemURL(quality: .high, url: soundURLs[.high], headers: headers))!
     }
 
     /// Returns the lowest quality URL found or nil if no URLs are available
-    public var lowestQualityURL: AudioItemURL {
-        return (AudioItemURL(quality: .Low, URL: soundURLs[.Low], headers: headers) ??
-            AudioItemURL(quality: .Medium, URL: soundURLs[.Medium], headers: headers) ??
-            AudioItemURL(quality: .High, URL: soundURLs[.High], headers: headers))!
+    open var lowestQualityURL: AudioItemURL {
+        return (AudioItemURL(quality: .low, url: soundURLs[.low], headers: headers) ??
+            AudioItemURL(quality: .medium, url: soundURLs[.medium], headers: headers) ??
+            AudioItemURL(quality: .high, url: soundURLs[.high], headers: headers))!
     }
 
 
@@ -139,35 +139,35 @@ public class AudioItem: NSObject {
 
     This can change over time which is why the property is dynamic. It enables KVO on the property.
     */
-    public dynamic var artist: String?
+    open dynamic var artist: String?
 
     /**
     The title of the item.
 
     This can change over time which is why the property is dynamic. It enables KVO on the property.
     */
-    public dynamic var title: String?
+    open dynamic var title: String?
 
     /**
     The album of the item.
 
     This can change over time which is why the property is dynamic. It enables KVO on the property.
     */
-    public dynamic var album: String?
+    open dynamic var album: String?
 
     /**
     The track count of the item's album.
 
     This can change over time which is why the property is dynamic. It enables KVO on the property.
     */
-    public dynamic var trackCount: NSNumber?
+    open dynamic var trackCount: NSNumber?
 
     /**
     The track number of the item in its album.
 
     This can change over time which is why the property is dynamic. It enables KVO on the property.
     */
-    public dynamic var trackNumber: NSNumber?
+    open dynamic var trackNumber: NSNumber?
 
     #if os(iOS)
     /**
@@ -175,7 +175,7 @@ public class AudioItem: NSObject {
 
     This can change over time which is why the property is dynamic. It enables KVO on the property.
     */
-    public dynamic var artworkImage: UIImage?
+    open dynamic var artworkImage: UIImage?
     #endif
 
 
@@ -188,7 +188,7 @@ public class AudioItem: NSObject {
 
     // MARK: Metadata
 
-    public func parseMetadata(items: [AVMetadataItem]) {
+    open func parseMetadata(_ items: [AVMetadataItem]) {
         items.forEach {
             if let commonKey = $0.commonKey {
                 switch commonKey {
@@ -203,7 +203,7 @@ public class AudioItem: NSObject {
                 default:
                     #if os(iOS)
                         if commonKey == AVMetadataCommonKeyArtwork && artworkImage == nil {
-                            artworkImage = ($0.value as? NSData).map { UIImage(data: $0) } ?? nil
+                            artworkImage = ($0.value as? Data).map { UIImage(data: $0) } ?? nil
                         }
                     #endif
                 }
